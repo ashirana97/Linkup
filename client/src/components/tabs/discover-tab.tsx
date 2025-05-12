@@ -26,8 +26,10 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
     }
   }, [locations, currentLocation]);
   
-  // Fetch check-ins
+  // Fetch check-ins for the selected location
   const { data: checkins, isLoading } = useCheckins(currentLocation?.id);
+  
+  console.log("Current location:", currentLocation?.id, "Checkins:", checkins);
   
   // Filter check-ins by interest if selected
   const filteredCheckins = selectedInterest && checkins
