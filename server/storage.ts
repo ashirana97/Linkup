@@ -116,6 +116,7 @@ export class MemStorage implements IStorage {
     this.currentCheckinId = 1;
     this.currentCheckinInterestId = 1;
     this.currentMessageId = 1;
+    this.currentConnectionRequestId = 1;
     
     // Initialize with some sample data
     this.initializeSampleData();
@@ -545,6 +546,48 @@ export class MemStorage implements IStorage {
     const updatedMessage: Message = { ...message, isRead: true };
     this.messages.set(id, updatedMessage);
     return updatedMessage;
+  }
+
+  // Connection Request methods
+  async getConnectionRequest(id: number): Promise<ConnectionRequest | undefined> {
+    return this.connectionRequests.get(id);
+  }
+
+  async getUserSentConnectionRequests(userId: number): Promise<ConnectionRequest[]> {
+    return Array.from(this.connectionRequests.values())
+      .filter(request => request.senderId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getUserReceivedConnectionRequests(userId: number): Promise<ConnectionRequest[]> {
+    return Array.from(this.connectionRequests.values())
+      .filter(request => request.receiverId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async createConnectionRequest(request: InsertConnectionRequest): Promise<ConnectionRequest> {
+    const id = this.currentConnectionRequestId++;
+    const newRequest: ConnectionRequest = { 
+      ...request, 
+      id, 
+      createdAt: new Date(), 
+      updatedAt: new Date() 
+    };
+    this.connectionRequests.set(id, newRequest);
+    return newRequest;
+  }
+
+  async updateConnectionRequestStatus(id: number, status: string): Promise<ConnectionRequest | undefined> {
+    const request = await this.getConnectionRequest(id);
+    if (!request) return undefined;
+    
+    const updatedRequest: ConnectionRequest = { 
+      ...request, 
+      status, 
+      updatedAt: new Date() 
+    };
+    this.connectionRequests.set(id, updatedRequest);
+    return updatedRequest;
   }
 }
 

@@ -8,7 +8,9 @@ import {
   insertMessageSchema,
   insertUserInterestSchema,
   insertUserActivitySchema,
-  type User
+  insertConnectionRequestSchema,
+  type User,
+  type ConnectionRequest
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -765,6 +767,174 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ===== Connection Request Routes =====
+
+  // Get received connection requests for a user
+  app.get('/api/users/:id/connection-requests/received', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const connectionRequests = await storage.getUserReceivedConnectionRequests(userId);
+      
+      // Enhance with user details
+      const enhancedRequests = await Promise.all(
+        connectionRequests.map(async (request) => {
+          const sender = await storage.getUser(request.senderId);
+          return {
+            ...request,
+            sender: sender ? {
+              id: sender.id,
+              username: sender.username,
+              firstName: sender.firstName,
+              lastName: sender.lastName,
+              profileImageUrl: sender.profileImageUrl,
+              bio: sender.bio
+            } : null
+          };
+        })
+      );
+      
+      res.json(enhancedRequests);
+    } catch (error) {
+      console.error("Error fetching received connection requests:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Get sent connection requests for a user
+  app.get('/api/users/:id/connection-requests/sent', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      const connectionRequests = await storage.getUserSentConnectionRequests(userId);
+      
+      // Enhance with user details
+      const enhancedRequests = await Promise.all(
+        connectionRequests.map(async (request) => {
+          const receiver = await storage.getUser(request.receiverId);
+          return {
+            ...request,
+            receiver: receiver ? {
+              id: receiver.id,
+              username: receiver.username,
+              firstName: receiver.firstName,
+              lastName: receiver.lastName,
+              profileImageUrl: receiver.profileImageUrl,
+              bio: receiver.bio
+            } : null
+          };
+        })
+      );
+      
+      res.json(enhancedRequests);
+    } catch (error) {
+      console.error("Error fetching sent connection requests:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Create a new connection request (icebreaker or wave)
+  app.post('/api/connection-requests', async (req, res) => {
+    try {
+      const requestSchema = z.object({
+        senderId: z.number(),
+        receiverId: z.number(),
+        message: z.string().optional(),
+      });
+      
+      const validationResult = requestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid request data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const { senderId, receiverId, message } = validationResult.data;
+      
+      // Check if users exist
+      const sender = await storage.getUser(senderId);
+      const receiver = await storage.getUser(receiverId);
+      
+      if (!sender || !receiver) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if there's already a pending request between these users
+      const sentRequests = await storage.getUserSentConnectionRequests(senderId);
+      const existingRequest = sentRequests.find(req => 
+        req.receiverId === receiverId && req.status === "pending"
+      );
+      
+      if (existingRequest) {
+        return res.status(409).json({ 
+          message: "A connection request already exists between these users",
+          requestId: existingRequest.id
+        });
+      }
+      
+      // Create the connection request
+      const newRequest = await storage.createConnectionRequest({
+        senderId,
+        receiverId,
+        message: message || null,
+        status: "pending"
+      });
+      
+      res.status(201).json(newRequest);
+    } catch (error) {
+      console.error("Error creating connection request:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Update a connection request status (accept/decline)
+  app.patch('/api/connection-requests/:id', async (req, res) => {
+    try {
+      const requestId = parseInt(req.params.id);
+      
+      if (isNaN(requestId)) {
+        return res.status(400).json({ message: "Invalid request ID" });
+      }
+      
+      const requestSchema = z.object({
+        status: z.enum(["accepted", "declined"]),
+      });
+      
+      const validationResult = requestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid request data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const { status } = validationResult.data;
+      
+      // Update the request status
+      const updatedRequest = await storage.updateConnectionRequestStatus(requestId, status);
+      
+      if (!updatedRequest) {
+        return res.status(404).json({ message: "Connection request not found" });
+      }
+      
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating connection request:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+
   // Don't need to add helper function as getAllUsers is now part of the IStorage interface
 
   const httpServer = createServer(app);
