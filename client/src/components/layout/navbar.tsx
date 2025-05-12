@@ -16,6 +16,7 @@ import { useState } from "react";
 
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
+  // Initialize mobile menu as closed by default
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getInitials = () => {
@@ -60,13 +61,13 @@ export function Navbar() {
         
         {/* Mobile Menu Trigger */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon" className="mr-2">
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="md:hidden mr-2">
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="md:hidden">
+          <SheetContent side="left">
             <div className="px-2 py-6">
               <Link href="/" onClick={closeMobileMenu} className="flex items-center mb-8">
                 <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
