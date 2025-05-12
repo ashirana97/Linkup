@@ -7,29 +7,35 @@ import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 import LoginPage from "@/pages/login";
 import { ProtectedRoute } from "@/components/auth/protected-route";
+import { Layout } from "@/components/layout/layout";
+import { UserProfile } from "@/components/auth/user-profile";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/checkin" component={Home} />
-      <Route path="/messages">
-        {() => (
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route path="/profile">
-        {() => (
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        )}
-      </Route>
-      <Route component={NotFound} />
-    </Switch>
+    <Layout>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/login" component={LoginPage} />
+        <Route path="/checkin" component={Home} />
+        <Route path="/messages">
+          {() => (
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          )}
+        </Route>
+        <Route path="/profile">
+          {() => (
+            <ProtectedRoute>
+              <div className="container py-8">
+                <UserProfile />
+              </div>
+            </ProtectedRoute>
+          )}
+        </Route>
+        <Route component={NotFound} />
+      </Switch>
+    </Layout>
   );
 }
 
