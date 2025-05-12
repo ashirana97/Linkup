@@ -110,8 +110,8 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
   
   return (
     <TabContent id="checkin" active={active}>
-      <div className="pb-24"> {/* Added extra padding at bottom to prevent button overlap */}
-        <div className="flex justify-between items-center mb-6">
+      <div className="pb-24 tab-content"> {/* Added extra padding at bottom to prevent button overlap */}
+        <div className="flex justify-between items-center mb-6 tab-header">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Check In</h1>
             <p className="text-sm text-gray-500">Let others know you're here</p>

@@ -46,7 +46,7 @@ const ProfileTab = ({ active }: ProfileTabProps) => {
   
   return (
     <TabContent id="profile" active={active}>
-      <div className="flex flex-col items-center mb-6">
+      <div className="flex flex-col items-center mb-6 tab-header">
         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-lg mb-3">
           <Avatar className="w-full h-full">
             <AvatarImage 
