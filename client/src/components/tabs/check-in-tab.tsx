@@ -59,7 +59,7 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
     // Add the interest IDs
     values.interestIds = selectedInterests.map(interest => interest.id);
     
-    // Use the first user ID for now (in a real app this would come from auth)
+    // Use user ID 1 for our demo user
     createCheckin.mutate({
       userId: 1,
       ...values,
@@ -67,6 +67,10 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
       onSuccess: () => {
         // Navigate to discover tab
         setLocation("/");
+      },
+      onError: (error) => {
+        console.error("Check-in error:", error);
+        alert("There was an error checking in. Please try again.");
       }
     });
   };

@@ -15,6 +15,7 @@ export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
   
@@ -110,6 +111,19 @@ export class MemStorage implements IStorage {
   }
   
   private initializeSampleData() {
+    // Add a default user
+    const defaultUser: InsertUser = {
+      username: "demo_user",
+      password: "password123",
+      firstName: "Demo",
+      lastName: "User",
+      profileImageUrl: null,
+      bio: "I'm a demo user exploring the app",
+      location: "San Francisco"
+    };
+    
+    this.createUser(defaultUser);
+    
     // Add sample locations
     const locations: InsertLocation[] = [
       { name: "Downtown Coffee Shop", address: "123 Main St", type: "coffee", icon: "ri-store-2-line" },
@@ -157,6 +171,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
+  }
+  
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
