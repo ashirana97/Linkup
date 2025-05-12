@@ -67,7 +67,7 @@ export function Navbar() {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left">
+          <SheetContent side="left" className="bg-white dark:bg-black border-r z-50 w-64">
             <div className="px-2 py-6">
               <Link href="/" onClick={closeMobileMenu} className="flex items-center mb-8">
                 <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
@@ -80,31 +80,31 @@ export function Navbar() {
                     key={route.path} 
                     href={route.path}
                     onClick={closeMobileMenu}
-                    className="flex items-center text-sm font-medium transition-colors hover:text-primary"
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-800 dark:text-gray-200"
                   >
                     {route.icon}
-                    {route.name}
+                    <span>{route.name}</span>
                   </Link>
                 ))}
               </nav>
               {isAuthenticated && user && (
-                <div className="mt-8 pt-4 border-t">
+                <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <Link 
                     href="/profile" 
                     onClick={closeMobileMenu}
-                    className="flex items-center gap-2 mb-4"
+                    className="flex items-center gap-3 p-3 mb-4 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-9 w-9">
                       <AvatarImage src={user.profileImageUrl || undefined} alt={user.username || 'User'} />
                       <AvatarFallback>{getInitials()}</AvatarFallback>
                     </Avatar>
-                    <span className="font-medium">
+                    <span className="font-medium text-gray-800 dark:text-gray-200">
                       {user.firstName && user.lastName 
                         ? `${user.firstName} ${user.lastName}` 
                         : user.username}
                     </span>
                   </Link>
-                  <div className="flex justify-center mb-4">
+                  <div className="px-3 mb-4">
                     <LoginButton 
                       variant="destructive" 
                       size="sm" 
@@ -114,7 +114,7 @@ export function Navbar() {
                 </div>
               )}
               {!isAuthenticated && (
-                <div className="flex justify-center mt-8 pt-4 border-t">
+                <div className="mt-8 pt-4 px-3 border-t border-gray-200 dark:border-gray-700">
                   <LoginButton 
                     variant="default" 
                     size="sm" 
