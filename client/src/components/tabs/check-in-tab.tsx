@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { TabContent } from "@/components/ui/tab";
 import { useCreateCheckin } from "@/hooks/use-checkins";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Location, Activity, Interest } from "@shared/schema";
+import { cn } from "@/lib/utils";
 import { Search } from "lucide-react";
 
 interface CheckInTabProps {
@@ -43,6 +44,7 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   
   const createCheckin = useCreateCheckin();
+  const [formIsValid, setFormIsValid] = useState(false);
   
   // Create form
   const form = useForm<CheckInFormValues>({
@@ -52,7 +54,17 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
       duration: "1",
       interestIds: [],
     },
+    mode: "onChange",
   });
+  
+  // Watch required fields to enable/disable button
+  const locationId = useWatch({ control: form.control, name: "locationId" });
+  const activityId = useWatch({ control: form.control, name: "activityId" });
+  
+  // Update form validity when required fields change
+  useEffect(() => {
+    setFormIsValid(!!locationId && !!activityId);
+  }, [locationId, activityId]);
   
   // Handle form submission
   const onSubmit = (values: CheckInFormValues) => {
@@ -285,8 +297,13 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
             
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-opacity-90 text-white font-medium py-6 mb-10"
-                disabled={createCheckin.isPending}
+                className={cn(
+                  "w-full font-medium py-6 mb-10",
+                  formIsValid 
+                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                    : "bg-gray-300 text-gray-600"
+                )}
+                disabled={createCheckin.isPending || !formIsValid}
               >
                 {createCheckin.isPending ? "Checking in..." : "Check In Now"}
               </Button>
