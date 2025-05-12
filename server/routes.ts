@@ -542,6 +542,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ===== Message Routes =====
   
   // Get user conversations (summary of all conversations)
+  // Get recommended users based on shared interests
+  app.get('/api/users/:id/recommendations', async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+      
+      // 1. Get the user's interests
+      const userInterests = await storage.getUserInterests(userId);
+      
+      if (!userInterests || userInterests.length === 0) {
+        return res.json([]);
+      }
+      
+      // 2. Get all users
+      const allUsers = await storage.getAllUsers();
+      
+      // 3. Calculate interest similarity for each user
+      const recommendations = [];
+      
+      for (const otherUser of allUsers) {
+        // Skip the current user
+        if (otherUser.id === userId) continue;
+        
+        // Get the other user's interests
+        const otherUserInterests = await storage.getUserInterests(otherUser.id);
+        
+        if (!otherUserInterests || otherUserInterests.length === 0) continue;
+        
+        // Calculate similarity score (Jaccard index)
+        const userInterestIds = new Set(userInterests.map(i => i.id));
+        const otherUserInterestIds = new Set(otherUserInterests.map(i => i.id));
+        
+        // Find shared interests
+        const sharedInterests = userInterests.filter(interest => 
+          otherUserInterestIds.has(interest.id)
+        );
+        
+        // Calculate intersection size
+        const intersectionSize = sharedInterests.length;
+        
+        // Calculate union size (A ∪ B)
+        const unionSize = userInterestIds.size + otherUserInterestIds.size - intersectionSize;
+        
+        // Calculate Jaccard index (0 to 1) - J(A,B) = |A ∩ B| / |A ∪ B|
+        const similarity = unionSize > 0 ? intersectionSize / unionSize : 0;
+        
+        // Store recommendation with similarity score and shared interests
+        if (similarity > 0) {
+          const { password, ...userWithoutPassword } = otherUser;
+          recommendations.push({
+            user: userWithoutPassword,
+            similarityScore: similarity.toFixed(2),
+            sharedInterests,
+            totalSharedInterests: sharedInterests.length
+          });
+        }
+      }
+      
+      // 4. Sort by similarity score (descending)
+      recommendations.sort((a, b) => 
+        parseFloat(b.similarityScore as string) - parseFloat(a.similarityScore as string)
+      );
+      
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Error getting user recommendations:', error);
+      res.status(500).json({ message: "Failed to get user recommendations" });
+    }
+  });
+  
   app.get('/api/users/:id/conversations', async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
