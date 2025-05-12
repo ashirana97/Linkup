@@ -107,7 +107,7 @@ export function Navbar() {
                   <div className="px-3 mb-4">
                     <a 
                       href="/api/logout"
-                      className="flex items-center gap-2 px-4 py-2 w-full text-center rounded-md text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="flex items-center justify-center gap-2 px-4 py-2 w-full text-center rounded-md bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
                       <span>Sign Out</span>
@@ -165,9 +165,9 @@ export function Navbar() {
                   <Link href="/settings">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild className="text-red-500 hover:text-red-600 focus:bg-red-50 focus:text-red-600">
-                  <a href="/api/logout" className="flex items-center">
-                    <LogOut className="h-4 w-4 mr-2" />
+                <DropdownMenuItem asChild className="p-0 focus:bg-transparent">
+                  <a href="/api/logout" className="flex items-center justify-center w-full gap-2 px-2 py-1.5 rounded-sm bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white transition-colors">
+                    <LogOut className="h-4 w-4" />
                     <span>Sign Out</span>
                   </a>
                 </DropdownMenuItem>
