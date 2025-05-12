@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { LoginButton } from "../auth/login-button";
 import { useAuth } from "../../hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MapPin, Users, Bell, MessageSquare, Menu } from "lucide-react";
+import { MapPin, Users, Bell, MessageSquare, Menu, LogOut } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -105,11 +105,13 @@ export function Navbar() {
                     </span>
                   </Link>
                   <div className="px-3 mb-4">
-                    <LoginButton 
-                      variant="destructive" 
-                      size="sm" 
-                      className="w-full"
-                    />
+                    <a 
+                      href="/api/logout"
+                      className="flex items-center gap-2 px-4 py-2 w-full text-center rounded-md text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Sign Out</span>
+                    </a>
                   </div>
                 </div>
               )}
@@ -163,8 +165,11 @@ export function Navbar() {
                   <Link href="/settings">Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a href="/api/logout">Sign Out</a>
+                <DropdownMenuItem asChild className="text-red-500 hover:text-red-600 focus:bg-red-50 focus:text-red-600">
+                  <a href="/api/logout" className="flex items-center">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    <span>Sign Out</span>
+                  </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
