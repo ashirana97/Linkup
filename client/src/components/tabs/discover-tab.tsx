@@ -44,7 +44,12 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
     fetch('/api/users/1')
       .then(res => res.json())
       .then(data => {
-        setCurrentUser(data);
+        // Add password field to match User type
+        const userWithPassword = {
+          ...data,
+          password: "" // Empty string as password placeholder
+        };
+        setCurrentUser(userWithPassword);
       })
       .catch(err => {
         console.error('Error fetching current user:', err);
@@ -92,7 +97,13 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
       }
       
       // Set the selected user and open the dialog
-      setSelectedUser(userCheckin.user);
+      // We need to include password field because that's expected in the User type
+      // In a real app, passwords would never be sent to the client
+      const userWithPassword = {
+        ...userCheckin.user,
+        password: "" // Empty string as password placeholder
+      };
+      setSelectedUser(userWithPassword);
       setDialogOpen(true);
     } catch (error) {
       console.error("Error connecting with user:", error);
