@@ -93,19 +93,6 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
   
   return (
     <>
-      {/* Large Floating Check-in Button at bottom right */}
-      <div className="fixed bottom-20 right-6 z-50">
-        <Button
-          onClick={() => setLocation("/checkin")}
-          variant="default"
-          size="lg"
-          className="bg-primary text-white flex items-center rounded-full shadow-lg"
-        >
-          <MapPin className="h-5 w-5 mr-2" />
-          Check In
-        </Button>
-      </div>
-    
       <TabContent id="discover" active={active}>
         <div className="flex justify-between items-center mb-4 sticky top-0 z-10 bg-background pt-2 pb-3">
           <div>
