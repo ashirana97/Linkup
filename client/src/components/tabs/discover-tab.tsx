@@ -138,7 +138,7 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
             <h1 className="text-2xl font-bold gradient-text">Discover</h1>
             <p className="text-sm text-gray-500">Find people around you</p>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 header-actions">
             <Button 
               onClick={toggleFilters}
               variant="outline" 
@@ -205,7 +205,7 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
           <p className="text-sm text-gray-500">People currently checked in at this location</p>
         </div>
         
-        <div className="user-cards-list space-y-4">
+        <div className="user-cards-list space-y-4 tab-content">
           {isLoading ? (
             // Loading state
             <>

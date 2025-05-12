@@ -69,14 +69,14 @@ const MessagesTab = ({ active }: MessagesTabProps) => {
       ) : (
         // Show the conversation list
         <>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6 tab-header">
             <div>
               <h1 className="text-2xl font-bold gradient-text">Messages</h1>
               <p className="text-sm text-gray-500">Your conversations</p>
             </div>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-3 tab-content">
             {isLoading ? (
               // Loading state
               <>
