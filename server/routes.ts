@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertUserSchema, 
   insertCheckinSchema, 
@@ -22,6 +23,28 @@ const addHours = (date: Date, hours: number) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication
+  await setupAuth(app);
+  
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Remove password from response
+      const { password, ...userWithoutPassword } = user;
+      
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching authenticated user:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
   // API Routes
   const apiRouter = app.route('/api');
   
@@ -100,11 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user profile
   app.get('/api/users/:id', async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
-      
-      if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
+      const userId = req.params.id;
       
       const user = await storage.getUser(userId);
       
@@ -116,8 +135,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { password, ...userWithoutPassword } = user;
       
       // Get user interests and activities
-      const interests = await storage.getUserInterests(userId);
-      const activities = await storage.getUserActivities(userId);
+      const interests = await storage.getUserInterests(Number(userId));
+      const activities = await storage.getUserActivities(Number(userId));
       
       res.json({
         ...userWithoutPassword,
@@ -379,13 +398,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Fetch additional data for each check-in
       const checkinDetails = await Promise.all(checkins.map(async (checkin) => {
-        const user = await storage.getUser(checkin.userId);
+        const user = await storage.getUser(String(checkin.userId));
         const location = await storage.getLocation(checkin.locationId);
         const activity = await storage.getActivity(checkin.activityId);
         const interests = await storage.getCheckinInterests(checkin.id);
         
-        // Remove password from user data
-        const { password, ...userWithoutPassword } = user!;
+        // Check if user exists and remove password from user data
+        if (!user) {
+          return {
+            ...checkin,
+            user: { id: String(checkin.userId), username: "Unknown User" },
+            location,
+            activity,
+            interests
+          };
+        }
+        
+        const { password, ...userWithoutPassword } = user;
         
         return {
           ...checkin,
