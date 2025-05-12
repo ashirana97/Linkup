@@ -97,9 +97,8 @@ const UserCard = ({ checkin, onConnect }: UserCardProps) => {
           
           <div className="mt-4 flex justify-end">
             <Button 
-              variant="default" 
               size="sm"
-              className="flex items-center" 
+              className="flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-md transition-all" 
               onClick={() => onConnect(checkin.user.id)}
             >
               <MessageCircle className="h-4 w-4 mr-1" />

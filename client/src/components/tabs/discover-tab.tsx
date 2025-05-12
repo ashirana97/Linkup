@@ -5,13 +5,15 @@ import LocationSelector from "@/components/discover/location-selector";
 import InterestsFilter from "@/components/discover/interests-filter";
 import UserCard from "@/components/discover/user-card";
 import RecommendationsSection from "@/components/discover/recommendations-section";
+import ConnectionRequestDialog from "@/components/discover/connection-request-dialog";
 import LocationMap from "@/components/map/location-map";
 import { useCheckins } from "@/hooks/use-checkins";
 import { useLocations } from "@/hooks/use-locations";
-import { Location } from "@shared/schema";
-import { Filter, Map, List, ChevronUp, ChevronDown, MapPin } from "lucide-react";
+import { Location, User } from "@shared/schema";
+import { Filter, Map, List, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "@/hooks/use-toast";
 
 interface DiscoverTabProps {
   active: boolean;
@@ -24,6 +26,9 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
   const [selectedInterest, setSelectedInterest] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [showFilters, setShowFilters] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   
   // Set default location when data is loaded
   useEffect(() => {
@@ -31,6 +36,20 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
       setCurrentLocation(locations[0]);
     }
   }, [locations, currentLocation]);
+  
+  // Fetch current user
+  useEffect(() => {
+    // In a real app, we would use a proper auth system
+    // For now, we'll fetch user ID 1 as the current user
+    fetch('/api/users/1')
+      .then(res => res.json())
+      .then(data => {
+        setCurrentUser(data);
+      })
+      .catch(err => {
+        console.error('Error fetching current user:', err);
+      });
+  }, []);
   
   // Fetch check-ins for the selected location
   const { data: checkins, isLoading } = useCheckins(currentLocation?.id);
@@ -50,49 +69,58 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
     setShowFilters(!showFilters);
   };
   
-  const handleConnect = (userId: number) => {
-    // Send a message to initiate conversation
-    console.log("Connecting with user:", userId);
-    
+  const handleConnect = async (userId: number) => {
     // Don't send a message if connecting with yourself
-    if (userId === 1) {
-      console.log("Cannot connect with yourself");
-      setLocation(`/messages`);
+    if (userId === 1 || !currentUser) {
+      toast({
+        description: "Cannot connect with yourself",
+        variant: "destructive",
+      });
       return;
     }
     
-    // Use the API to send a message
-    fetch(`/api/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        senderId: 1, // Current user ID (demo user)
-        receiverId: userId,
-        content: "Hi! I saw your check-in and wanted to connect." 
-      })
-    })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        console.error("Failed to send initial message");
-        throw new Error("Failed to send message");
+    try {
+      // Find the user in the check-ins
+      const userCheckin = checkins?.find(c => c.user.id === userId);
+      
+      if (!userCheckin) {
+        toast({
+          description: "User not found",
+          variant: "destructive",
+        });
+        return;
       }
-    })
-    .then(data => {
-      console.log("Message sent successfully:", data);
-      // Navigate to messages tab after connecting
-      setLocation(`/messages`);
-    })
-    .catch(error => {
-      console.error("Error sending message:", error);
-    });
+      
+      // Set the selected user and open the dialog
+      setSelectedUser(userCheckin.user);
+      setDialogOpen(true);
+    } catch (error) {
+      console.error("Error connecting with user:", error);
+      toast({
+        title: "Connection failed",
+        description: "There was an error connecting with this user.",
+        variant: "destructive",
+      });
+    }
   };
   
   return (
     <>
+      {/* Connection Request Dialog */}
+      {currentUser && selectedUser && (
+        <ConnectionRequestDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          currentUser={currentUser}
+          targetUser={selectedUser}
+          onSuccess={() => {
+            setSelectedUser(null);
+            // After sending a connection request, you might want to update some UI
+            // or refresh data, but we'll keep it simple
+          }}
+        />
+      )}
+      
       <TabContent id="discover" active={active}>
         <div className="flex justify-between items-center mb-4 sticky top-0 z-10 bg-background pt-2 pb-3">
           <div>
