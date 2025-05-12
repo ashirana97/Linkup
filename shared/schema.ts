@@ -140,6 +140,28 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   content: true,
 });
 
+// Connection requests table (for icebreakers)
+export const connectionRequests = pgTable("connection_requests", {
+  id: serial("id").primaryKey(),
+  senderId: integer("sender_id").notNull(),
+  receiverId: integer("receiver_id").notNull(),
+  message: text("message"),
+  status: text("status").notNull().default("pending"), // pending, accepted, declined
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertConnectionRequestSchema = createInsertSchema(connectionRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).pick({
+  senderId: true,
+  receiverId: true,
+  message: true,
+  status: true,
+});
+
 // Define types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -160,10 +182,13 @@ export type UserActivity = typeof userActivities.$inferSelect;
 export type InsertUserActivity = z.infer<typeof insertUserActivitySchema>;
 
 export type Checkin = typeof checkins.$inferSelect;
-export type InsertCheckin = z.infer<typeof insertCheckinSchema>;
+export type InsertCheckin = z.infer<typeof insertCheckinSchema> & { interestIds?: number[] };
 
 export type CheckinInterest = typeof checkinInterests.$inferSelect;
 export type InsertCheckinInterest = z.infer<typeof insertCheckinInterestSchema>;
 
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+
+export type ConnectionRequest = typeof connectionRequests.$inferSelect;
+export type InsertConnectionRequest = z.infer<typeof insertConnectionRequestSchema>;

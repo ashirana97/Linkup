@@ -7,7 +7,8 @@ import {
   userActivities, type UserActivity, type InsertUserActivity,
   checkins, type Checkin, type InsertCheckin,
   checkinInterests, type CheckinInterest, type InsertCheckinInterest,
-  messages, type Message, type InsertMessage
+  messages, type Message, type InsertMessage,
+  connectionRequests, type ConnectionRequest, type InsertConnectionRequest
 } from "@shared/schema";
 
 // Modify the interface with any CRUD methods you need
@@ -62,6 +63,13 @@ export interface IStorage {
   getUserConversations(userId: number): Promise<{ user: User, latestMessage: Message }[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   markMessageAsRead(id: number): Promise<Message | undefined>;
+  
+  // Connection Request methods
+  getConnectionRequest(id: number): Promise<ConnectionRequest | undefined>;
+  getUserSentConnectionRequests(userId: number): Promise<ConnectionRequest[]>;
+  getUserReceivedConnectionRequests(userId: number): Promise<ConnectionRequest[]>;
+  createConnectionRequest(request: InsertConnectionRequest): Promise<ConnectionRequest>;
+  updateConnectionRequestStatus(id: number, status: string): Promise<ConnectionRequest | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -74,6 +82,7 @@ export class MemStorage implements IStorage {
   private checkins: Map<number, Checkin>;
   private checkinInterests: Map<number, CheckinInterest>;
   private messages: Map<number, Message>;
+  private connectionRequests: Map<number, ConnectionRequest>;
   
   currentUserId: number;
   currentLocationId: number;
@@ -84,6 +93,7 @@ export class MemStorage implements IStorage {
   currentCheckinId: number;
   currentCheckinInterestId: number;
   currentMessageId: number;
+  currentConnectionRequestId: number;
 
   constructor() {
     this.users = new Map();
@@ -95,6 +105,7 @@ export class MemStorage implements IStorage {
     this.checkins = new Map();
     this.checkinInterests = new Map();
     this.messages = new Map();
+    this.connectionRequests = new Map();
     
     this.currentUserId = 1;
     this.currentLocationId = 1;
