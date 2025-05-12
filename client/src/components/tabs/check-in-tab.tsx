@@ -89,8 +89,8 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
   };
   
   // Filter interests based on search term
-  const filteredInterests = allInterests && allInterests.length > 0 
-    ? allInterests.filter(interest => 
+  const filteredInterests = allInterests && Array.isArray(allInterests) && allInterests.length > 0 
+    ? allInterests.filter((interest: Interest) => 
         interest.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !selectedInterests.some(i => i.id === interest.id)
       ).slice(0, 5)
@@ -173,8 +173,8 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
                           <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
                           <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
                         </>
-                      ) : activities && activities.length > 0 ? (
-                        activities.map(activity => (
+                      ) : activities && Array.isArray(activities) && activities.length > 0 ? (
+                        activities.map((activity: Activity) => (
                           <button
                             key={activity.id}
                             type="button"
@@ -238,7 +238,7 @@ const CheckInTab = ({ active }: CheckInTabProps) => {
                 
                   {searchTerm && filteredInterests.length > 0 && (
                     <div className="absolute top-full left-0 mt-1 w-48 bg-white shadow-lg rounded-md z-10">
-                      {filteredInterests.map(interest => (
+                      {filteredInterests.map((interest: Interest) => (
                         <div
                           key={interest.id}
                           className="px-3 py-2 hover:bg-gray-100 cursor-pointer"

@@ -9,12 +9,13 @@ import CheckInButton from "@/components/discover/check-in-button";
 
 function Router() {
   const [location] = useLocation();
-  // Only show the check-in button on the main pages, NOT on the check-in page
-  const showCheckInButton = location === "/" || location === "/messages" || location === "/profile";
+  
+  // Don't show the floating check-in button on the check-in page to avoid overlapping with form elements
+  const isCheckInPage = location === "/checkin";
   
   return (
     <>
-      {showCheckInButton && <CheckInButton />}
+      {!isCheckInPage && <CheckInButton />}
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/checkin" component={Home} />
