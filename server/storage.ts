@@ -111,7 +111,7 @@ export class MemStorage implements IStorage {
   }
   
   private initializeSampleData() {
-    // Add a default user
+    // Add a default user for the current logged in user
     const defaultUser: InsertUser = {
       username: "demo_user",
       password: "password123",
@@ -123,6 +123,40 @@ export class MemStorage implements IStorage {
     };
     
     this.createUser(defaultUser);
+    
+    // Add more sample users for social discovery
+    const sampleUsers: InsertUser[] = [
+      {
+        username: "alex_dev",
+        password: "password123",
+        firstName: "Alex",
+        lastName: "Chen",
+        profileImageUrl: null,
+        bio: "Software engineer & coffee enthusiast",
+        location: "San Francisco"
+      },
+      {
+        username: "sara_design",
+        password: "password123",
+        firstName: "Sara",
+        lastName: "Johnson",
+        profileImageUrl: null,
+        bio: "UX Designer looking for collaboration",
+        location: "San Francisco"
+      },
+      {
+        username: "mike_data",
+        password: "password123",
+        firstName: "Mike",
+        lastName: "Wilson",
+        profileImageUrl: null,
+        bio: "Data scientist & math tutor",
+        location: "San Francisco"
+      }
+    ];
+    
+    // Create sample users (IDs will be 2, 3, 4)
+    sampleUsers.forEach(user => this.createUser(user));
     
     // Add sample locations
     const locations: InsertLocation[] = [
@@ -160,6 +194,53 @@ export class MemStorage implements IStorage {
     ];
     
     interests.forEach(interest => this.createInterest(interest));
+    
+    // Add interests to users
+    this.addUserInterest({ userId: 2, interestId: 3 }); // Alex: Web Development
+    this.addUserInterest({ userId: 2, interestId: 2 }); // Alex: Programming
+    this.addUserInterest({ userId: 2, interestId: 7 }); // Alex: Coffee
+    
+    this.addUserInterest({ userId: 3, interestId: 1 }); // Sara: UX Design
+    this.addUserInterest({ userId: 3, interestId: 3 }); // Sara: Web Development
+    this.addUserInterest({ userId: 3, interestId: 9 }); // Sara: Tech
+    
+    this.addUserInterest({ userId: 4, interestId: 5 }); // Mike: Data Science
+    this.addUserInterest({ userId: 4, interestId: 11 }); // Mike: Math
+    this.addUserInterest({ userId: 4, interestId: 12 }); // Mike: Business
+    
+    // Create active check-ins for the sample users at different locations
+    const now = new Date();
+    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+    
+    // Alex is at Downtown Coffee Shop (networking)
+    this.createCheckin({
+      userId: 2,
+      locationId: 1,
+      activityId: 1,
+      note: "Working on a project, happy to chat about web dev",
+      expiresAt: oneHourLater,
+      interestIds: [3]
+    });
+    
+    // Sara is at Tech Hub Coworking (collaboration)
+    this.createCheckin({
+      userId: 3,
+      locationId: 3,
+      activityId: 3,
+      note: "Looking for design feedback on my latest project",
+      expiresAt: oneHourLater,
+      interestIds: [1]
+    });
+    
+    // Mike is at Central Library (studying)
+    this.createCheckin({
+      userId: 4,
+      locationId: 2,
+      activityId: 2,
+      note: "Studying data science, happy to help with math questions",
+      expiresAt: oneHourLater,
+      interestIds: [5, 11]
+    });
   }
 
   // User methods
@@ -331,13 +412,27 @@ export class MemStorage implements IStorage {
   
   async createCheckin(checkin: InsertCheckin): Promise<Checkin> {
     const id = this.currentCheckinId++;
+    
+    // Extract and remove interestIds from checkin data
+    const interestIds = checkin.interestIds || [];
+    const { interestIds: _, ...checkinData } = checkin;
+    
     const newCheckin: Checkin = { 
-      ...checkin, 
+      ...checkinData, 
       id, 
       createdAt: new Date(), 
       isActive: true 
     };
     this.checkins.set(id, newCheckin);
+    
+    // Add checkin interests if provided
+    for (const interestId of interestIds) {
+      await this.addCheckinInterest({
+        checkinId: id,
+        interestId
+      });
+    }
+    
     return newCheckin;
   }
   
