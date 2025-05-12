@@ -9,7 +9,7 @@ import CheckInButton from "@/components/discover/check-in-button";
 
 function Router() {
   const [location] = useLocation();
-  // Only show the check-in button on the home/discover page, not on the check-in page itself
+  // Only show the check-in button on the main pages, NOT on the check-in page
   const showCheckInButton = location === "/" || location === "/messages" || location === "/profile";
   
   return (
