@@ -541,7 +541,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ===== Message Routes =====
   
-  // Get user conversations
+  // Get user conversations (summary of all conversations)
   app.get('/api/users/:id/conversations', async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
@@ -558,18 +558,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const conversations = await storage.getUserConversations(userId);
       
-      // Remove passwords from user data
-      const sanitizedConversations = conversations.map(conv => {
-        const { password, ...userWithoutPassword } = conv.user;
-        return {
-          ...conv,
-          user: userWithoutPassword
-        };
-      });
-      
-      res.json(sanitizedConversations);
+      res.json(conversations);
     } catch (error) {
-      console.error("Error fetching user conversations:", error);
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Get messages for a conversation
+  app.get('/api/conversations/:partnerId', async (req, res) => {
+    try {
+      // For demo purposes, currentUserId is hardcoded to 1
+      const currentUserId = 1; 
+      const partnerId = parseInt(req.params.partnerId);
+      
+      if (isNaN(partnerId)) {
+        return res.status(400).json({ message: "Invalid partner ID" });
+      }
+      
+      // Get all messages between these users
+      const allMessages = await storage.getUserMessages(currentUserId);
+      const conversationMessages = allMessages.filter(msg => 
+        (msg.senderId === currentUserId && msg.receiverId === partnerId) || 
+        (msg.senderId === partnerId && msg.receiverId === currentUserId)
+      );
+      
+      // Sort messages by date (oldest first)
+      conversationMessages.sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      );
+      
+      res.json(conversationMessages);
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Create a new message
+  app.post('/api/messages', async (req, res) => {
+    try {
+      const messageData = insertMessageSchema.parse(req.body);
+      
+      // Check if users exist
+      const sender = await storage.getUser(messageData.senderId);
+      if (!sender) {
+        return res.status(404).json({ message: "Sender not found" });
+      }
+      
+      const receiver = await storage.getUser(messageData.receiverId);
+      if (!receiver) {
+        return res.status(404).json({ message: "Receiver not found" });
+      }
+      
+      // Create the message
+      const newMessage = await storage.createMessage(messageData);
+      res.status(201).json(newMessage);
+    } catch (error) {
+      console.error("Error creating message:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+  // Mark message as read
+  app.patch('/api/messages/:id/read', async (req, res) => {
+    try {
+      const messageId = parseInt(req.params.id);
+      
+      if (isNaN(messageId)) {
+        return res.status(400).json({ message: "Invalid message ID" });
+      }
+      
+      const updatedMessage = await storage.markMessageAsRead(messageId);
+      
+      if (!updatedMessage) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+      
+      res.json(updatedMessage);
+    } catch (error) {
+      console.error("Error marking message as read:", error);
       res.status(500).json({ message: "Server error" });
     }
   });

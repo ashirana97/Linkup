@@ -45,7 +45,7 @@ export function useMarkMessageAsRead() {
   
   return useMutation({
     mutationFn: async (messageId: number) => {
-      const res = await apiRequest('POST', `/api/messages/${messageId}/read`, {});
+      const res = await apiRequest('PATCH', `/api/messages/${messageId}/read`, {});
       return res.json() as Promise<Message>;
     },
     onSuccess: () => {

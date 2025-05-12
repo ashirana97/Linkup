@@ -39,9 +39,29 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
     : checkins;
   
   const handleConnect = (userId: number) => {
-    // In a real app, this would open a conversation or connection screen
-    console.log(`Connect with user ${userId}`);
-    setLocation(`/messages`);
+    // Send a message to initiate conversation
+    fetch(`/api/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        senderId: 1, // Current user ID (demo user)
+        receiverId: userId,
+        content: "Hi! I saw your check-in and wanted to connect." 
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        // Navigate to messages tab after connecting
+        setLocation(`/messages`);
+      } else {
+        console.error("Failed to send initial message");
+      }
+    })
+    .catch(error => {
+      console.error("Error sending message:", error);
+    });
   };
   
   return (
