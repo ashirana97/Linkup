@@ -29,44 +29,44 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/">
-            <a className="font-bold text-xl bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
+            <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
               SpotConnect
-            </a>
+            </span>
           </Link>
           <nav className="hidden md:flex gap-4">
             <Link href="/">
-              <a className={cn(
+              <span className={cn(
                 "text-sm font-medium hover:text-primary transition-colors",
                 location === "/" ? "text-primary" : "text-muted-foreground"
               )}>
                 Discover
-              </a>
+              </span>
             </Link>
             <Link href="/checkin">
-              <a className={cn(
+              <span className={cn(
                 "text-sm font-medium hover:text-primary transition-colors",
                 location === "/checkin" ? "text-primary" : "text-muted-foreground"
               )}>
                 Check-in
-              </a>
+              </span>
             </Link>
             {isAuthenticated && (
               <>
                 <Link href="/messages">
-                  <a className={cn(
+                  <span className={cn(
                     "text-sm font-medium hover:text-primary transition-colors",
                     location === "/messages" ? "text-primary" : "text-muted-foreground"
                   )}>
                     Messages
-                  </a>
+                  </span>
                 </Link>
                 <Link href="/profile">
-                  <a className={cn(
+                  <span className={cn(
                     "text-sm font-medium hover:text-primary transition-colors",
                     location === "/profile" ? "text-primary" : "text-muted-foreground"
                   )}>
                     Profile
-                  </a>
+                  </span>
                 </Link>
               </>
             )}
@@ -101,26 +101,26 @@ export function Navbar() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href="/checkin">
-                    <a className="flex items-center cursor-pointer w-full">
+                    <div className="flex items-center cursor-pointer w-full">
                       <MapPin className="mr-2 h-4 w-4" />
                       <span>Check-in</span>
-                    </a>
+                    </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/messages">
-                    <a className="flex items-center cursor-pointer w-full">
+                    <div className="flex items-center cursor-pointer w-full">
                       <MessageCircle className="mr-2 h-4 w-4" />
                       <span>Messages</span>
-                    </a>
+                    </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
-                    <a className="flex items-center cursor-pointer w-full">
+                    <div className="flex items-center cursor-pointer w-full">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profile</span>
-                    </a>
+                    </div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

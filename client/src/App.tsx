@@ -16,7 +16,13 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/login" component={LoginPage} />
-        <Route path="/checkin" component={Home} />
+        <Route path="/checkin">
+          {() => (
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          )}
+        </Route>
         <Route path="/messages">
           {() => (
             <ProtectedRoute>

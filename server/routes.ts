@@ -471,9 +471,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create a check-in
-  app.post('/api/checkins', async (req, res) => {
+  app.post('/api/checkins', isAuthenticated, async (req: any, res) => {
     try {
       const { duration, interestIds, ...checkinData } = req.body;
+      
+      // Get authenticated user ID from session
+      const userId = req.user.claims.sub;
       
       // Calculate expiration time
       const durationHours = parseInt(duration) || 1;
@@ -481,13 +484,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const checkinWithExpiry = {
         ...checkinData,
+        userId, // Use the authenticated user's ID
         expiresAt
       };
       
       const validatedCheckin = insertCheckinSchema.parse(checkinWithExpiry);
       
       // Check if resources exist
-      const user = await storage.getUser(validatedCheckin.userId);
+      const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
