@@ -14,7 +14,8 @@ export const TabContent: React.FC<TabContentProps> = ({
   return (
     <div 
       id={id} 
-      className={`${active ? 'block' : 'hidden'} px-4 pt-4`}
+      className={`${active ? 'block' : 'hidden'} px-4 pt-2 overflow-y-auto max-h-[calc(100vh-5rem)]`}
+      style={{ scrollbarWidth: 'thin' }}
     >
       {children}
     </div>

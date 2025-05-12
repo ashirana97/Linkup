@@ -89,7 +89,7 @@ export default function RecommendationsSection({
   }
   
   return (
-    <div className="py-6">
+    <div className="py-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold gradient-text">
           <Percent className="inline-block h-5 w-5 mr-2" />
@@ -103,7 +103,7 @@ export default function RecommendationsSection({
         </Tabs>
       </div>
       
-      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hidden">
+      <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hidden" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
         {recommendations.map((recommendation: UserRecommendation) => (
           <RecommendationCard 
             key={recommendation.user.id}
