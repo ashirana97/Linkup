@@ -27,7 +27,7 @@ export function getSession() {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: true,
+    createTableIfMissing: false,
     ttl: sessionTtl,
     tableName: "sessions",
   });
@@ -63,8 +63,6 @@ async function upsertUser(
     firstName: claims["first_name"],
     lastName: claims["last_name"],
     profileImageUrl: claims["profile_image_url"],
-    username: claims["email"] ? claims["email"].split('@')[0] : `user_${claims["sub"]}`,
-    password: "", // We don't need a password for OIDC users
   });
 }
 

@@ -1,5 +1,5 @@
 import {
-  users, type User, type InsertUser,
+  users, type User, type InsertUser, type UpsertUser,
   locations, type Location, type InsertLocation,
   interests, type Interest, type InsertInterest,
   userInterests, type UserInterest, type InsertUserInterest,
@@ -224,16 +224,6 @@ export class MemStorage implements IStorage {
     // Create active check-ins for the sample users at different locations
     const now = new Date();
     const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-    
-    // Alex is at Downtown Coffee Shop (networking)
-    this.createCheckin({
-      userId: 2,
-      locationId: 1,
-      activityId: 1,
-      note: "Working on a project, happy to chat about web dev",
-      expiresAt: oneHourLater,
-      interestIds: [3]
-    });
     
     // Sara is at Tech Hub Coworking (collaboration)
     this.createCheckin({

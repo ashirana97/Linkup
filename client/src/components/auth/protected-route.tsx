@@ -27,7 +27,7 @@ export function ProtectedRoute({
   if (!isAuthenticated) {
     // Redirect to login page with a returnTo parameter
     const redirectPath = `${redirectTo}?returnTo=${encodeURIComponent(location)}`;
-    return <Navigate to={redirectPath} />;
+    return <Redirect to={redirectPath} />;
   }
 
   return <>{children}</>;
