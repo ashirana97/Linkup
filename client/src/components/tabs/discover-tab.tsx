@@ -9,7 +9,7 @@ import LocationMap from "@/components/map/location-map";
 import { useCheckins } from "@/hooks/use-checkins";
 import { useLocations } from "@/hooks/use-locations";
 import { Location } from "@shared/schema";
-import { Filter, Map, List, ChevronUp, ChevronDown } from "lucide-react";
+import { Filter, Map, List, ChevronUp, ChevronDown, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -99,6 +99,15 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
           <p className="text-sm text-gray-500">Find people around you</p>
         </div>
         <div className="flex space-x-2">
+          <Button
+            onClick={() => setLocation("/checkin")}
+            variant="default"
+            size="sm"
+            className="bg-primary text-white flex items-center"
+          >
+            <MapPin className="h-4 w-4 mr-1" />
+            Check In
+          </Button>
           <Button 
             onClick={toggleFilters}
             variant="outline" 
