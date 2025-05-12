@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TabContent } from "@/components/ui/tab";
 import MessageListItem from "@/components/messages/message-list-item";
@@ -6,6 +6,8 @@ import Conversation from "@/components/messages/conversation";
 import { useConversations } from "@/hooks/use-messages";
 import { useLocation } from "wouter";
 import { UserProfile } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { UserPlus, ArrowRight, MessagesSquare } from "lucide-react";
 
 interface MessagesTabProps {
   active: boolean;
@@ -69,7 +71,7 @@ const MessagesTab = ({ active }: MessagesTabProps) => {
         <>
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Messages</h1>
+              <h1 className="text-2xl font-bold gradient-text">Messages</h1>
               <p className="text-sm text-gray-500">Your conversations</p>
             </div>
           </div>
@@ -78,9 +80,9 @@ const MessagesTab = ({ active }: MessagesTabProps) => {
             {isLoading ? (
               // Loading state
               <>
-                <div className="bg-white rounded-lg shadow animate-pulse h-24"></div>
-                <div className="bg-white rounded-lg shadow animate-pulse h-24"></div>
-                <div className="bg-white rounded-lg shadow animate-pulse h-24"></div>
+                <div className="glass-card animate-pulse h-24"></div>
+                <div className="glass-card animate-pulse h-24"></div>
+                <div className="glass-card animate-pulse h-24"></div>
               </>
             ) : conversations && conversations.length > 0 ? (
               // Render conversations
@@ -93,16 +95,22 @@ const MessagesTab = ({ active }: MessagesTabProps) => {
               ))
             ) : (
               // Empty state
-              <div className="flex justify-center py-8 text-center text-gray-500">
-                <div>
-                  <p className="mb-2">Connect with more people to start conversations!</p>
-                  <button 
-                    className="text-primary font-medium"
-                    onClick={navigateToDiscover}
-                  >
-                    Discover People
-                  </button>
+              <div className="glass-card flex flex-col items-center py-12 text-center">
+                <div className="mb-4 bg-primary bg-opacity-10 p-4 rounded-full">
+                  <MessagesSquare className="h-10 w-10 text-primary" />
                 </div>
+                <h3 className="text-lg font-semibold mb-2">No messages yet</h3>
+                <p className="text-gray-500 mb-6 max-w-xs">
+                  Connect with people nearby to start conversations!
+                </p>
+                <Button 
+                  onClick={navigateToDiscover}
+                  className="flex items-center"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Discover People
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
               </div>
             )}
           </div>

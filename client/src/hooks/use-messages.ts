@@ -26,10 +26,33 @@ export function useSendMessage() {
   
   return useMutation({
     mutationFn: async (messageData: MessageInput) => {
-      const res = await apiRequest('POST', '/api/messages', messageData);
-      return res.json() as Promise<Message>;
+      try {
+        const res = await apiRequest('POST', '/api/messages', messageData);
+        return res.json() as Promise<Message>;
+      } catch (error) {
+        console.error("Error sending message:", error);
+        // Create a fallback message for better UX, will be updated when sync happens
+        const tempMessage: Message = {
+          id: Math.floor(Math.random() * -1000), // Temporary negative ID
+          senderId: messageData.senderId,
+          receiverId: messageData.receiverId,
+          content: messageData.content,
+          createdAt: new Date(),
+          isRead: false
+        };
+        
+        // Add to the local cache immediately
+        queryClient.setQueryData(
+          [`/api/conversations/${messageData.receiverId}`],
+          (old: Message[] = []) => [...old, tempMessage]
+        );
+        
+        // Rethrow the error to be handled by onError
+        throw error;
+      }
     },
     onSuccess: (_, variables) => {
+      // Invalidate and refetch queries related to this conversation
       queryClient.invalidateQueries({ 
         queryKey: [`/api/conversations/${variables.receiverId}`] 
       });
@@ -37,6 +60,16 @@ export function useSendMessage() {
         queryKey: [`/api/users/${variables.senderId}/conversations`] 
       });
     },
+    onError: (error) => {
+      console.error("Failed to send message:", error);
+      // Could show toast notification here
+      setTimeout(() => {
+        // After a delay, retry fetching conversations to sync with server
+        queryClient.invalidateQueries({
+          queryKey: ['/api/conversations']
+        });
+      }, 3000);
+    }
   });
 }
 

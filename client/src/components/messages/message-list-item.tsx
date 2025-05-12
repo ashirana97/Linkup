@@ -1,7 +1,8 @@
-import { User } from "@shared/schema";
 import { ConversationSummary } from "@/lib/types";
 import { getMessageTime } from "@/hooks/use-messages";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Clock } from "lucide-react";
 
 interface MessageListItemProps {
   conversation: ConversationSummary;
@@ -27,31 +28,41 @@ const MessageListItem = ({ conversation, onClick }: MessageListItemProps) => {
   
   return (
     <div 
-      className="bg-white rounded-lg shadow flex items-center p-3 cursor-pointer hover:bg-gray-50"
+      className="glass-card flex items-center p-4 cursor-pointer hover:bg-white transition-all duration-200"
       onClick={() => onClick(user.id)}
     >
-      <div className="w-14 h-14 relative mr-3">
+      <div className="w-14 h-14 relative mr-4">
         <Avatar className="w-full h-full">
           <AvatarImage 
             src={user.profileImageUrl || ''} 
             alt={user.username}
             className="w-full h-full object-cover" 
           />
-          <AvatarFallback className="w-full h-full text-lg">
+          <AvatarFallback className="w-full h-full text-lg bg-gradient-to-br from-primary to-secondary text-white">
             {initials}
           </AvatarFallback>
         </Avatar>
         {isActive && (
-          <div className="active-dot absolute right-0 bottom-0 w-3 h-3 bg-success rounded-full border-2 border-white"></div>
+          <div className="pulse absolute right-0 bottom-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
         )}
       </div>
       
       <div className="flex-1">
-        <div className="flex justify-between items-center mb-1">
-          <h3 className="font-semibold">{user.firstName || user.username}</h3>
-          <span className="text-xs text-gray-500">{messageTime}</span>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-semibold text-gray-800">{user.firstName || user.username}</h3>
+          <div className="flex items-center">
+            <Clock className="h-3 w-3 mr-1 text-gray-400" />
+            <span className="text-xs text-gray-500">{messageTime}</span>
+          </div>
         </div>
-        <p className="text-sm text-gray-600 truncate">{latestMessage.content}</p>
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-gray-600 truncate max-w-[200px]">{latestMessage.content}</p>
+          {!latestMessage.isRead && latestMessage.senderId !== 1 && (
+            <Badge variant="default" className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full">
+              <span className="text-[10px]">1</span>
+            </Badge>
+          )}
+        </div>
       </div>
     </div>
   );
