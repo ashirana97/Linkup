@@ -40,6 +40,16 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
   
   const handleConnect = (userId: number) => {
     // Send a message to initiate conversation
+    console.log("Connecting with user:", userId);
+    
+    // Don't send a message if connecting with yourself
+    if (userId === 1) {
+      console.log("Cannot connect with yourself");
+      setLocation(`/messages`);
+      return;
+    }
+    
+    // Use the API to send a message
     fetch(`/api/messages`, {
       method: 'POST',
       headers: {
@@ -53,11 +63,16 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
     })
     .then(response => {
       if (response.ok) {
-        // Navigate to messages tab after connecting
-        setLocation(`/messages`);
+        return response.json();
       } else {
         console.error("Failed to send initial message");
+        throw new Error("Failed to send message");
       }
+    })
+    .then(data => {
+      console.log("Message sent successfully:", data);
+      // Navigate to messages tab after connecting
+      setLocation(`/messages`);
     })
     .catch(error => {
       console.error("Error sending message:", error);

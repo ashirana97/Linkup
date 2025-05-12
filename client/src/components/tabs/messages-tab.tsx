@@ -27,10 +27,18 @@ const MessagesTab = ({ active }: MessagesTabProps) => {
   });
   
   const handleConversationClick = (userId: number) => {
+    console.log("Opening conversation with user:", userId);
+    
     // Fetch the user profile and open conversation
     fetch(`/api/users/${userId}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+        return res.json();
+      })
       .then(userData => {
+        console.log("User data received:", userData);
         setActiveConversation(userData);
       })
       .catch(err => {

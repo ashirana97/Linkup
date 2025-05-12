@@ -49,7 +49,8 @@ const Conversation = ({ partner, currentUserId, onBack }: ConversationProps) => 
     });
   };
   
-  const formatMessageTime = (dateString: string | Date) => {
+  const formatMessageTime = (dateString: string | Date | null) => {
+    if (!dateString) return '';
     return getMessageTime(dateString);
   };
   
