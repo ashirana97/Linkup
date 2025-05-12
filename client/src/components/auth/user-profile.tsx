@@ -1,47 +1,34 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "../../hooks/useAuth";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
 
 export function UserProfile() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="pb-2 space-y-4">
-          <div className="flex items-center space-x-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
-  if (!isAuthenticated || !user) {
+  if (!user) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Please Sign In</CardTitle>
+          <CardTitle>User Profile</CardTitle>
+          <CardDescription>You are not signed in.</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Sign in to view your profile and access all features.
-          </p>
+          <Button 
+            onClick={() => window.location.href = "/api/login"}
+            className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white"
+          >
+            Sign In
+          </Button>
         </CardContent>
       </Card>
     );
@@ -51,38 +38,58 @@ export function UserProfile() {
     if (user.firstName && user.lastName) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
     }
-    return user.username.substring(0, 2).toUpperCase();
+    return user.username?.substring(0, 2).toUpperCase() || "U";
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="pb-2">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={user.profileImageUrl || undefined} alt={user.username} />
-            <AvatarFallback>{getInitials()}</AvatarFallback>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <div className="flex items-center gap-4">
+          <Avatar className="h-16 w-16">
+            <AvatarImage src={user.profileImageUrl || undefined} alt={user.username || 'User'} />
+            <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle className="text-xl">
-              {user.firstName} {user.lastName}
+            <CardTitle className="text-2xl">
+              {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.username}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">@{user.username}</p>
+            {user.username && (
+              <CardDescription className="text-lg">@{user.username}</CardDescription>
+            )}
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {user.bio && (
-          <p className="text-sm text-muted-foreground mb-4">{user.bio}</p>
+          <div>
+            <h3 className="font-medium text-lg mb-2">About</h3>
+            <p className="text-muted-foreground">{user.bio}</p>
+          </div>
         )}
-        <div className="text-sm">
-          <div className="flex items-center justify-between py-1">
-            <span className="font-medium">Email</span>
-            <span className="text-muted-foreground">{user.email || "Not provided"}</span>
+        
+        {user.email && (
+          <div>
+            <h3 className="font-medium text-lg mb-2">Email</h3>
+            <p className="text-muted-foreground">{user.email}</p>
           </div>
-          <div className="flex items-center justify-between py-1">
-            <span className="font-medium">Location</span>
-            <span className="text-muted-foreground">{user.location || "Not provided"}</span>
+        )}
+        
+        {user.location && (
+          <div>
+            <h3 className="font-medium text-lg mb-2">Location</h3>
+            <p className="text-muted-foreground">{user.location}</p>
           </div>
+        )}
+        
+        <div className="pt-4">
+          <Button 
+            variant="destructive" 
+            onClick={() => window.location.href = "/api/logout"}
+            className="flex items-center"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </CardContent>
     </Card>
