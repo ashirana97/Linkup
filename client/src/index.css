@@ -114,12 +114,19 @@ body {
 .scrollbar-hidden {
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* IE/Edge */
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 .scrollbar-hidden::-webkit-scrollbar {
   display: none !important; /* Chrome, Safari, Opera */
   width: 0 !important;
   height: 0 !important;
+}
+
+/* Prevent nested scrollbars */
+.no-nested-scroll {
+  overflow: visible !important;
 }
 
 /* Match percentage badge styling */

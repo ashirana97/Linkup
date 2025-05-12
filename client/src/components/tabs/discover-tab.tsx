@@ -92,123 +92,129 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
   };
   
   return (
-    <TabContent id="discover" active={active}>
-      <div className="flex justify-between items-center mb-4 sticky top-0 z-10 bg-background pt-2 pb-3">
-        <div>
-          <h1 className="text-2xl font-bold gradient-text">Discover</h1>
-          <p className="text-sm text-gray-500">Find people around you</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => setLocation("/checkin")}
-            variant="default"
-            size="sm"
-            className="bg-primary text-white flex items-center whitespace-nowrap"
-          >
-            <MapPin className="h-4 w-4 mr-1" />
-            Check In
-          </Button>
-          <Button 
-            onClick={toggleFilters}
-            variant="outline" 
-            size="sm"
-            className="flex items-center"
-          >
-            <Filter className="h-4 w-4 mr-1" />
-            {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-          
-          <Button 
-            onClick={toggleViewMode}
-            variant="outline" 
-            size="sm"
-            className="flex items-center"
-          >
-            {viewMode === 'list' ? 
-              <><Map className="h-4 w-4 mr-1" /> Map</> : 
-              <><List className="h-4 w-4 mr-1" /> List</>
-            }
-          </Button>
-        </div>
+    <>
+      {/* Large Floating Check-in Button at bottom right */}
+      <div className="fixed bottom-20 right-6 z-50">
+        <Button
+          onClick={() => setLocation("/checkin")}
+          variant="default"
+          size="lg"
+          className="bg-primary text-white flex items-center rounded-full shadow-lg"
+        >
+          <MapPin className="h-5 w-5 mr-2" />
+          Check In
+        </Button>
       </div>
-      
-      {showFilters && (
-        <div className="glass-card p-4 mb-4 space-y-4">
-          <LocationSelector 
-            currentLocation={currentLocation} 
-            onLocationChange={setCurrentLocation}
-          />
-          
-          <InterestsFilter 
-            selectedInterest={selectedInterest}
-            onSelectInterest={setSelectedInterest}
-          />
-        </div>
-      )}
-      
-      {viewMode === 'map' && (
-        <div className="mb-4 rounded-lg overflow-hidden h-[300px] shadow-md">
-          <LocationMap 
-            locations={locations}
-            selectedLocation={currentLocation}
-            onLocationSelect={setCurrentLocation}
-            className="h-full w-full"
-          />
-        </div>
-      )}
-      
-      {/* Recommendations section */}
-      <RecommendationsSection 
-        userId={1} // Current user ID (demo user)
-        onConnect={handleConnect}
-        onMessage={(userId) => {
-          // Navigate to the messages tab with this user
-          setLocation(`/messages`);
-        }}
-      />
-      
-      <Separator className="my-6" />
-      
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold gradient-text mb-1">Active Check-ins</h2>
-        <p className="text-sm text-gray-500">People currently checked in at this location</p>
-      </div>
-      
-      <div className="user-cards-list space-y-4">
-        {isLoading ? (
-          // Loading state
-          <>
-            <div className="glass-card animate-pulse h-48"></div>
-            <div className="glass-card animate-pulse h-48"></div>
-          </>
-        ) : filteredCheckins && filteredCheckins.length > 0 ? (
-          // Render checkins
-          filteredCheckins.map(checkin => (
-            <UserCard 
-              key={checkin.id} 
-              checkin={checkin}
-              onConnect={handleConnect}
-            />
-          ))
-        ) : (
-          // Empty state
-          <div className="glass-card p-8 text-center">
-            <p className="text-gray-500">
-              {selectedInterest 
-                ? `No one is checked in with interest in ${selectedInterest}` 
-                : 'No one is checked in at this location'}
-            </p>
-            <Button
-              variant="link"
-              className="mt-3 text-primary font-medium"
-              onClick={() => setSelectedInterest(null)}
+    
+      <TabContent id="discover" active={active}>
+        <div className="flex justify-between items-center mb-4 sticky top-0 z-10 bg-background pt-2 pb-3">
+          <div>
+            <h1 className="text-2xl font-bold gradient-text">Discover</h1>
+            <p className="text-sm text-gray-500">Find people around you</p>
+          </div>
+          <div className="flex space-x-2">
+            <Button 
+              onClick={toggleFilters}
+              variant="outline" 
+              size="sm"
+              className="flex items-center"
             >
-              {selectedInterest ? 'Clear filter' : 'Try another location'}
+              <Filter className="h-4 w-4 mr-1" />
+              {showFilters ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+            
+            <Button 
+              onClick={toggleViewMode}
+              variant="outline" 
+              size="sm"
+              className="flex items-center"
+            >
+              {viewMode === 'list' ? 
+                <><Map className="h-4 w-4 mr-1" /> Map</> : 
+                <><List className="h-4 w-4 mr-1" /> List</>
+              }
             </Button>
           </div>
+        </div>
+        
+        {showFilters && (
+          <div className="glass-card p-4 mb-4 space-y-4">
+            <LocationSelector 
+              currentLocation={currentLocation} 
+              onLocationChange={setCurrentLocation}
+            />
+            
+            <InterestsFilter 
+              selectedInterest={selectedInterest}
+              onSelectInterest={setSelectedInterest}
+            />
+          </div>
         )}
-      </div>
-    </TabContent>
+        
+        {viewMode === 'map' && (
+          <div className="mb-4 rounded-lg overflow-hidden h-[300px] shadow-md">
+            <LocationMap 
+              locations={locations}
+              selectedLocation={currentLocation}
+              onLocationSelect={setCurrentLocation}
+              className="h-full w-full"
+            />
+          </div>
+        )}
+        
+        {/* Recommendations section */}
+        <RecommendationsSection 
+          userId={1} // Current user ID (demo user)
+          onConnect={handleConnect}
+          onMessage={(userId) => {
+            // Navigate to the messages tab with this user
+            setLocation(`/messages`);
+          }}
+        />
+        
+        <Separator className="my-6" />
+        
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold gradient-text mb-1">Active Check-ins</h2>
+          <p className="text-sm text-gray-500">People currently checked in at this location</p>
+        </div>
+        
+        <div className="user-cards-list space-y-4">
+          {isLoading ? (
+            // Loading state
+            <>
+              <div className="glass-card animate-pulse h-48"></div>
+              <div className="glass-card animate-pulse h-48"></div>
+            </>
+          ) : filteredCheckins && filteredCheckins.length > 0 ? (
+            // Render checkins
+            filteredCheckins.map(checkin => (
+              <UserCard 
+                key={checkin.id} 
+                checkin={checkin}
+                onConnect={handleConnect}
+              />
+            ))
+          ) : (
+            // Empty state
+            <div className="glass-card p-8 text-center">
+              <p className="text-gray-500">
+                {selectedInterest 
+                  ? `No one is checked in with interest in ${selectedInterest}` 
+                  : 'No one is checked in at this location'}
+              </p>
+              <Button
+                variant="link"
+                className="mt-3 text-primary font-medium"
+                onClick={() => setSelectedInterest(null)}
+              >
+                {selectedInterest ? 'Clear filter' : 'Try another location'}
+              </Button>
+            </div>
+          )}
+        </div>
+      </TabContent>
+    </>
   );
 };
 
