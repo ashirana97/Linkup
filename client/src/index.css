@@ -147,3 +147,27 @@ body {
 .recommendation-card:hover {
   transform: translateY(-5px);
 }
+
+/* Fix for tab header sticky positioning */
+.tab-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: var(--background);
+  padding-top: 0.5rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Fix for proper scrolling in tab content */
+.tab-content {
+  overflow-y: auto;
+  padding-top: 0.5rem;
+}
+
+/* Prevent buttons from overlapping with content when scrolling */
+.header-actions {
+  position: relative;
+  z-index: 50;
+}

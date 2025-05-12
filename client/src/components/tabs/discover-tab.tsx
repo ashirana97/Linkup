@@ -133,7 +133,7 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
       )}
       
       <TabContent id="discover" active={active}>
-        <div className="flex justify-between items-center mb-4 sticky top-0 z-10 bg-background pt-2 pb-3">
+        <div className="flex justify-between items-center mb-4 tab-header">
           <div>
             <h1 className="text-2xl font-bold gradient-text">Discover</h1>
             <p className="text-sm text-gray-500">Find people around you</p>
