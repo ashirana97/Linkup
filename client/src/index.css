@@ -93,6 +93,7 @@ body {
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -107,4 +108,33 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #4f46e5;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Match percentage badge styling */
+.match-badge {
+  background: var(--primary-gradient);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Recommendation cards hover effect */
+.recommendation-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-5px);
 }

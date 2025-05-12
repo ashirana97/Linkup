@@ -4,12 +4,14 @@ import { TabContent } from "@/components/ui/tab";
 import LocationSelector from "@/components/discover/location-selector";
 import InterestsFilter from "@/components/discover/interests-filter";
 import UserCard from "@/components/discover/user-card";
+import RecommendationsSection from "@/components/discover/recommendations-section";
 import LocationMap from "@/components/map/location-map";
 import { useCheckins } from "@/hooks/use-checkins";
 import { useLocations } from "@/hooks/use-locations";
 import { Location } from "@shared/schema";
 import { Filter, Map, List, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface DiscoverTabProps {
   active: boolean;
@@ -145,6 +147,23 @@ const DiscoverTab = ({ active }: DiscoverTabProps) => {
           />
         </div>
       )}
+      
+      {/* Recommendations section */}
+      <RecommendationsSection 
+        userId={1} // Current user ID (demo user)
+        onConnect={handleConnect}
+        onMessage={(userId) => {
+          // Navigate to the messages tab with this user
+          setLocation(`/messages`);
+        }}
+      />
+      
+      <Separator className="my-6" />
+      
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold gradient-text mb-1">Active Check-ins</h2>
+        <p className="text-sm text-gray-500">People currently checked in at this location</p>
+      </div>
       
       <div className="user-cards-list space-y-4">
         {isLoading ? (
