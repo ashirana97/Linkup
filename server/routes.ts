@@ -641,30 +641,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get messages for a conversation (endpoint moved below)
   
   // Create a new message
-  app.post('/api/messages', async (req, res) => {
-    try {
-      const messageData = insertMessageSchema.parse(req.body);
-      
-      // Check if users exist
-      const sender = await storage.getUser(messageData.senderId);
-      if (!sender) {
-        return res.status(404).json({ message: "Sender not found" });
-      }
-      
-      const receiver = await storage.getUser(messageData.receiverId);
-      if (!receiver) {
-        return res.status(404).json({ message: "Receiver not found" });
-      }
-      
-      // Create the message
-      const newMessage = await storage.createMessage(messageData);
-      res.status(201).json(newMessage);
-    } catch (error) {
-      console.error("Error creating message:", error);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
-  
   // Mark message as read
   app.patch('/api/messages/:id/read', async (req, res) => {
     try {
