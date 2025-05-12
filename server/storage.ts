@@ -14,11 +14,12 @@ import {
 // Modify the interface with any CRUD methods you need
 export interface IStorage {
   // User methods
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
   
   // Location methods
   getLocation(id: number): Promise<Location | undefined>;
@@ -73,7 +74,7 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   private locations: Map<number, Location>;
   private interests: Map<number, Interest>;
   private userInterests: Map<number, UserInterest>;
@@ -256,7 +257,7 @@ export class MemStorage implements IStorage {
   }
 
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
@@ -271,19 +272,47 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
+    // Generate a string ID for new users
+    const id = insertUser.id || `${this.currentUserId++}`;
+    const user: User = { 
+      ...insertUser,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     this.users.set(id, user);
     return user;
   }
   
-  async updateUser(id: number, updateData: Partial<InsertUser>): Promise<User | undefined> {
+  async updateUser(id: string, updateData: Partial<InsertUser>): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
     
-    const updatedUser = { ...user, ...updateData };
+    const updatedUser = { 
+      ...user, 
+      ...updateData,
+      updatedAt: new Date()
+    };
     this.users.set(id, updatedUser);
     return updatedUser;
+  }
+  
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existingUser = userData.id ? await this.getUser(userData.id) : undefined;
+    
+    if (existingUser) {
+      // Update existing user
+      const updatedUser = {
+        ...existingUser,
+        ...userData,
+        updatedAt: new Date()
+      };
+      this.users.set(userData.id, updatedUser);
+      return updatedUser;
+    } else {
+      // Create new user
+      return this.createUser(userData);
+    }
   }
   
   // Location methods
