@@ -61,14 +61,26 @@ async function upsertUser(
   const email = claims["email"] || "";
   const username = email.split('@')[0] || `user_${claims["sub"]}`;
   
-  await storage.upsertUser({
+  // Create user data with required fields
+  const userData: {
+    id: string;
+    username: string;
+    email?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    profileImageUrl?: string | null;
+  } = {
     id: claims["sub"],
-    username,
-    email: claims["email"],
-    firstName: claims["first_name"],
-    lastName: claims["last_name"],
-    profileImageUrl: claims["profile_image_url"],
-  });
+    username: username,
+  };
+  
+  // Add optional fields if available
+  if (claims["email"]) userData.email = claims["email"];
+  if (claims["first_name"]) userData.firstName = claims["first_name"];
+  if (claims["last_name"]) userData.lastName = claims["last_name"];
+  if (claims["profile_image_url"]) userData.profileImageUrl = claims["profile_image_url"];
+  
+  await storage.upsertUser(userData);
 }
 
 export async function setupAuth(app: Express) {

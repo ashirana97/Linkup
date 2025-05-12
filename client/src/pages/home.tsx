@@ -5,6 +5,7 @@ import DiscoverTab from "@/components/tabs/discover-tab";
 import CheckInTab from "@/components/tabs/check-in-tab";
 import MessagesTab from "@/components/tabs/messages-tab";
 import ProfileTab from "@/components/tabs/profile-tab";
+import { Layout } from "@/components/layout/layout";
 
 export default function Home() {
   const [location] = useLocation();
@@ -28,15 +29,17 @@ export default function Home() {
   };
   
   return (
-    <div className="app-container h-screen flex flex-col bg-gray-100">
-      <div className="content-area flex-grow overflow-y-auto pb-20">
-        <DiscoverTab active={activeTab === "discover"} />
-        <CheckInTab active={activeTab === "checkin"} />
-        <MessagesTab active={activeTab === "messages"} />
-        <ProfileTab active={activeTab === "profile"} />
+    <Layout>
+      <div className="app-container flex flex-col">
+        <div className="content-area flex-grow overflow-y-auto pb-20">
+          <DiscoverTab active={activeTab === "discover"} />
+          <CheckInTab active={activeTab === "checkin"} />
+          <MessagesTab active={activeTab === "messages"} />
+          <ProfileTab active={activeTab === "profile"} />
+        </div>
+        
+        <TabNavigation active={activeTab} onChange={handleTabChange} />
       </div>
-      
-      <TabNavigation active={activeTab} onChange={handleTabChange} />
-    </div>
+    </Layout>
   );
 }
