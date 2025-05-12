@@ -693,9 +693,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       // Sort by date
-      conversationMessages.sort((a, b) => 
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
+      conversationMessages.sort((a, b) => {
+        // Convert to timestamps for comparison (handle null dates safely)
+        const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : 
+                     (typeof a.createdAt === 'string' ? new Date(a.createdAt).getTime() : 0);
+        const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : 
+                     (typeof b.createdAt === 'string' ? new Date(b.createdAt).getTime() : 0);
+        return timeA - timeB;
+      });
       
       res.json(conversationMessages);
     } catch (error) {
@@ -760,10 +765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Helper function to add some methods to the storage interface
-  storage.getAllUsers = async (): Promise<User[]> => {
-    return Array.from(storage.users.values());
-  };
+  // Don't need to add helper function as getAllUsers is now part of the IStorage interface
 
   const httpServer = createServer(app);
   return httpServer;
