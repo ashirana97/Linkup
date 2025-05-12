@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { CheckinWithDetails } from "@/lib/types";
 import { getTimeSince } from "@/hooks/use-checkins";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Locate, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MessageCircle, Clock, MapPin } from "lucide-react";
 
 interface UserCardProps {
   checkin: CheckinWithDetails;
@@ -41,42 +41,49 @@ const UserCard = ({ checkin, onConnect }: UserCardProps) => {
   const initials = getInitials(checkin.user.firstName || checkin.user.username);
   
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="flex">
-        <div className="w-1/3 relative">
-          <div className="h-full w-full">
+    <div className="glass-card overflow-hidden">
+      <div className="flex flex-col sm:flex-row">
+        <div className="w-full sm:w-1/3 relative">
+          <div className="aspect-square sm:h-full w-full">
             <Avatar className="h-full w-full rounded-none">
               <AvatarImage 
                 src={checkin.user.profileImageUrl || ''} 
                 alt={checkin.user.username}
                 className="h-full w-full object-cover" 
               />
-              <AvatarFallback className="h-full w-full rounded-none text-4xl">
+              <AvatarFallback className="h-full w-full rounded-none text-4xl bg-gradient-to-br from-primary to-secondary text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
           </div>
           {isActive && (
-            <div className="active-dot absolute right-0 bottom-0 w-3 h-3 bg-success rounded-full border-2 border-white"></div>
+            <div className="pulse absolute right-2 bottom-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
           )}
         </div>
         
-        <div className="w-2/3 p-4">
+        <div className="w-full sm:w-2/3 p-4">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-semibold text-gray-800">
+              <h3 className="font-semibold text-gray-800 text-lg">
                 {checkin.user.firstName || checkin.user.username}
               </h3>
-              <p className="text-sm text-gray-500">Checked in {timeSince}</p>
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <Clock className="w-3 h-3 mr-1" />
+                <span>Checked in {timeSince}</span>
+              </div>
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <MapPin className="w-3 h-3 mr-1" />
+                <span>{checkin.location.name}</span>
+              </div>
             </div>
-            <div className={`${getActivityStyle(checkin.activity.name)} text-xs font-medium rounded-full px-2 py-1`}>
+            <div className={`${getActivityStyle(checkin.activity.name)} text-xs font-medium rounded-full px-3 py-1`}>
               {checkin.activity.name}
             </div>
           </div>
           
           {checkin.note && (
-            <div className="mt-2">
-              <p className="text-sm text-gray-600">{checkin.note}</p>
+            <div className="mt-3 p-2 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-600 italic">"{checkin.note}"</p>
             </div>
           )}
           
@@ -88,13 +95,16 @@ const UserCard = ({ checkin, onConnect }: UserCardProps) => {
             ))}
           </div>
           
-          <div className="mt-3 flex justify-end">
-            <button 
-              className="text-primary font-medium text-sm"
+          <div className="mt-4 flex justify-end">
+            <Button 
+              variant="default" 
+              size="sm"
+              className="flex items-center" 
               onClick={() => onConnect(checkin.user.id)}
             >
+              <MessageCircle className="h-4 w-4 mr-1" />
               Connect
-            </button>
+            </Button>
           </div>
         </div>
       </div>
